@@ -1,0 +1,3 @@
+hessian=cn.wulin.brace.utils.serialize.HessianSerialize
+jdk=cn.wulin.brace.utils.serialize.JdkSerialize
+protostuff=cn.wulin.brace.utils.serialize.ProtostuffSerialize

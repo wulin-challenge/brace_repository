@@ -1,0 +1,5 @@
+all=cn.wulin.brace.remoting.transport.dispatcher.all.AllDispatcher
+direct=cn.wulin.brace.remoting.transport.dispatcher.direct.DirectDispatcher
+message=cn.wulin.brace.remoting.transport.dispatcher.message.MessageOnlyDispatcher
+execution=cn.wulin.brace.remoting.transport.dispatcher.execution.ExecutionDispatcher
+connection=cn.wulin.brace.remoting.transport.dispatcher.connection.ConnectionOrderedDispatcher

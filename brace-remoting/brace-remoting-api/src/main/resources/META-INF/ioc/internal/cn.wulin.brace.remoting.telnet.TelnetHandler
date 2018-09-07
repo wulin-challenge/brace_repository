@@ -1,0 +1,4 @@
+clear=cn.wulin.brace.remoting.telnet.support.command.ClearTelnetHandler
+exit=cn.wulin.brace.remoting.telnet.support.command.ExitTelnetHandler
+help=cn.wulin.brace.remoting.telnet.support.command.HelpTelnetHandler
+log=cn.wulin.brace.remoting.telnet.support.command.LogTelnetHandler

@@ -1,0 +1,6 @@
+hessian=cn.wulin.brace.utils.serialize.HessianSerialize
+jdk=cn.wulin.brace.utils.serialize.JdkSerialize
+protostuff=cn.wulin.brace.utils.serialize.ProtostuffSerialize
+kryo=cn.wulin.brace.utils.serialize.KryoSerialize
+fastjson=cn.wulin.brace.utils.serialize.FastJsonSerialize
+fst=cn.wulin.brace.utils.serialize.FstSerialize

@@ -1,0 +1,3 @@
+fixed=cn.wulin.brace.remoting.threadpool.support.FixedThreadPool
+cached=cn.wulin.brace.remoting.threadpool.support.CachedThreadPool
+limited=cn.wulin.brace.remoting.threadpool.support.LimitedThreadPool

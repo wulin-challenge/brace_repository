@@ -1,0 +1,3 @@
+transport=cn.wulin.brace.remoting.transport.codec.TransportCodec
+telnet=cn.wulin.brace.remoting.telnet.codec.TelnetCodec
+exchange=cn.wulin.brace.remoting.telnet.codec.TelnetCodec
