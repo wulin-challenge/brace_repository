@@ -37,7 +37,9 @@ public class ZookeeperConfig {
 	 */
 	private ZkConnection zkConn = InterfaceExtensionLoader.getExtensionLoader(ZkConnection.class).getAdaptiveExtension();
 	
-	private ZookeeperConfig(){}
+	private ZookeeperConfig(){
+		
+	}
 	
 	/**
 	 * 连接zookeeper,默认采用spring的方式进行加载

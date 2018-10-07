@@ -1,6 +1,7 @@
 package cn.wulin.brace.zookeeper.locks;
 
 import java.nio.charset.Charset;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -33,6 +34,9 @@ public class SharedReentrantReadWriteLock {
 	 */
 	private AtomicLong localLockVersion = new AtomicLong(0);
 	private static final String lock_data_node = "dataNode";
+	
+	//放弃检测的开始时间
+	private Long giveUpCheckStartTime;
 	
 	public SharedReentrantReadWriteLock(String lockRootNode) {
 		instance = ZookeeperConfig.getInstance();
@@ -92,13 +96,16 @@ public class SharedReentrantReadWriteLock {
 	 * 写锁
 	 * @param readWriteCallback
 	 */
-	public void writeLock(ReadWriteCallback readWriteCallback) {
+	public <T> T writeLock(ReadWriteCallback<T> readWriteCallback) {
 		try {
 			lock.writeLock().acquire(readWriteCallback.getTime(), readWriteCallback.getUnit());
-			readWriteCallback.callback();
+			T result = readWriteCallback.callback();
+			readWriteCallback.readFail();
 			updateLockDataNodeData();
+			return result;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+			return null;
 		} finally {
 			try {
 				lock.writeLock().release();
@@ -112,7 +119,17 @@ public class SharedReentrantReadWriteLock {
 	 * 读锁
 	 * @param readWriteCallback
 	 */
-	public void readLock(ReadWriteCallback readWriteCallback) {
+	public <T> T readLock(ReadWriteCallback<T> readWriteCallback) {
+		
+		if(!readWriteCallback.getEveryTimeCheckLock()){
+			//若成立,直接调用回调
+			//为性能,放弃了%100的成功率
+			if(judgeGiveUpCheckLock(readWriteCallback)){
+				return readWriteCallback.callback();//建议此处的回调业务在毫秒内完成
+			}else{
+				giveUpCheckStartTime = getCurrentTime();
+			}
+		}
 		try {
 			lock.readLock().acquire(readWriteCallback.getTime(), readWriteCallback.getUnit());
 			
@@ -130,9 +147,10 @@ public class SharedReentrantReadWriteLock {
 					}
 				}
 			}
-			readWriteCallback.callback();
+			return readWriteCallback.callback();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+			return null;
 		} finally {
 			try {
 				lock.readLock().release();
@@ -141,4 +159,48 @@ public class SharedReentrantReadWriteLock {
 			}
 		}
 	}
+
+	/**
+	 * 判断放弃检测锁是否成立,此处为原则操作
+	 * @param readWriteCallback
+	 * @return
+	 */
+	private <T> boolean judgeGiveUpCheckLock(ReadWriteCallback<T> readWriteCallback) {
+		//放弃检测的开始时间,主要是处理第一次请求为null的情况
+		try {
+			localLock.lock();
+			long currentTime = getCurrentTime();
+			giveUpCheckStartTime = giveUpCheckStartTime == null?currentTime:giveUpCheckStartTime;
+			//将TimeUnit单位的放弃检测时间转为毫秒数
+			long checkTime = readWriteCallback.getGiveUpCheckTime();
+			TimeUnit checkUnit = readWriteCallback.getGiveUpCheckTimeUnit();
+			final Long millisToWait = (checkUnit != null) ? checkUnit.toMillis(checkTime) : null;
+			return giveUpCheckJudge(currentTime, checkUnit, millisToWait);
+		} finally {
+			if(localLock.isLocked()){
+				localLock.unlock();
+			}
+		}
+	}
+
+	/**
+	 * 获取当前时间
+	 * @return
+	 */
+	private long getCurrentTime() {
+		return System.currentTimeMillis();
+	}
+
+	/**
+	 * 放弃检测判断
+	 * @param currentTime
+	 * @param checkUnit
+	 * @param millisToWait
+	 * @return
+	 */
+	private boolean giveUpCheckJudge(long currentTime, TimeUnit checkUnit, final Long millisToWait) {
+		return checkUnit != null && ((currentTime-giveUpCheckStartTime)<=millisToWait) && (currentTime != giveUpCheckStartTime);
+	}
+	
+	
 }

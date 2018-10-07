@@ -13,7 +13,7 @@ public class TestSharedReentrantReadWriteLock {
 	
 	public static Integer common_testData;
 	
-	public static final String lock = "/locks";
+	public static final String lock = "/locks/rwl";
 	//模拟读客户端
 	private SharedReentrantReadWriteLock readClientLock = new SharedReentrantReadWriteLock(TestSharedReentrantReadWriteLock.lock);
 	//模拟写客户端
@@ -35,7 +35,7 @@ public class TestSharedReentrantReadWriteLock {
 
 	//模拟多客户端
 	private static void multiClient(final ReadWriteLockTest rwlt,final ReadWriteLockTest rwlt2) {
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 20; i++) {
 			//模拟写客户端
 			if((i%2)==0){
 //			if(i==0){
@@ -43,7 +43,7 @@ public class TestSharedReentrantReadWriteLock {
 					@Override
 					public void run() {
 						try {
-							rwlt.write();
+//							rwlt.write();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -75,29 +75,41 @@ public class TestSharedReentrantReadWriteLock {
         private Integer testData = 0;
         private Set<Thread> threadSet = new HashSet<>();
         
+        private boolean reentrantWrite = true;
      // 写入数据
         public void write() throws Exception {
-        	writeClientLock.writeLock(new ReadWriteCallback(5,TimeUnit.SECONDS){
+        	final ReadWriteLockTest me = this;
+        	writeClientLock.writeLock(new ReadWriteCallback<Void>(30,TimeUnit.SECONDS){
 				@Override
-				public void callback() {
+				public Void callback() {
 					try {
 						Thread.sleep(10);
 						testData++;
 						TestSharedReentrantReadWriteLock.common_testData = testData;
 						String name = Thread.currentThread().getName();
 		                System.out.println("client1_"+name+"写入数据 testData:" + testData+",common_testData:"+TestSharedReentrantReadWriteLock.common_testData);
+		                
+		                if(reentrantWrite){
+		                	reentrantWrite = false;
+		                	try {
+								me.write();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+		                }
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+					return null;
 				}
         	});
         }
         
         // 读取数据
         private void read() throws Exception {
-        	readClientLock.readLock(new ReadWriteCallback(5,TimeUnit.SECONDS){
+        	readClientLock.readLock(new ReadWriteCallback<Void>(30,TimeUnit.SECONDS){
 				@Override
-				public void callback() {
+				public Void callback() {
 					try {
 						Thread.sleep(10);
 						String name = Thread.currentThread().getName();
@@ -105,6 +117,7 @@ public class TestSharedReentrantReadWriteLock {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+					return null;
 				}
 
 				@Override
