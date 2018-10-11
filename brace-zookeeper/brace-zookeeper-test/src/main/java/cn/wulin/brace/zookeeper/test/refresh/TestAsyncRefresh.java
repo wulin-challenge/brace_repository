@@ -9,6 +9,7 @@ import cn.wulin.brace.zookeeper.locks.refresh.WriteLockRefreshStrategy;
 public class TestAsyncRefresh {
 	
 	WriteLockRefreshStrategy asyncRefresh = new AsyncWriteLockRefreshStrategy();
+//	WriteLockRefreshStrategy asyncRefresh = new AsyncWriteLockRefreshStrategy(3000,1000);
 	
 	
 	public static void main(String[] args) throws IOException {
@@ -18,14 +19,21 @@ public class TestAsyncRefresh {
 	}
 	
 	private void mutilThreadtest(){
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 4; i++) {
 			final int j = i;
 			Thread thread = new Thread(new Runnable(){
 				@Override
 				public void run() {
 					if(j ==1){
-//						sleep(3000);
-						sleep(1000);
+						sleep(3000);
+//						sleep(1000);
+					}
+					
+					if(j ==2){
+						sleep(15000);
+					}
+					if(j ==3){
+						sleep(18000);
 					}
 //					if(j ==4){
 //						sleep(15000);

@@ -67,20 +67,25 @@ public abstract class AbstractWriteLockRefreshStrategy implements WriteLockRefre
 			return;
 		}else{
 			long currentTime;
+			boolean judgeFirstRequest;
 			try{
 				refreshLock.lock();
 				refreshing.set(true);
 				
 				currentTime = LockUtil.getCurrentTime();
 				firstRequestStartTime = firstRequestStartTime == null?currentTime:firstRequestStartTime;
+				judgeFirstRequest = judgeFirstRequest(currentTime);
+				if(!judgeFirstRequest){
+					firstRequestStartTime = currentTime;
+				}
 				firstRequestUnlock();//减锁第一个请求
 			}finally{
 				if(refreshLock.isLocked()){
 					refreshLock.unlock();
 				}
 			}
-			//保证连续两次请求之间的间隔差
-			if(judgeFirstRequest(currentTime)){
+			//保证连续两次请求数据刷新之间的间隔差
+			if(judgeFirstRequest){
 				asyncDelayRefresh(refrechHook, intervalTime+delayTime);
 			}else{
 				doRefresh(refrechHook);
