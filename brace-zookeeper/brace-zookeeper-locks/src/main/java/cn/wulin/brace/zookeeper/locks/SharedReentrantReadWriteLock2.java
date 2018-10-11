@@ -8,7 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.curator.framework.recipes.locks.InterProcessReadWriteLock;
 
 import cn.wulin.brace.zookeeper.ZookeeperConfig;
-import cn.wulin.brace.zookeeper.locks.util.LockUtil;
 import cn.wulin.ioc.logging.Logger;
 import cn.wulin.ioc.logging.LoggerFactory;
 
@@ -17,9 +16,9 @@ import cn.wulin.ioc.logging.LoggerFactory;
  * 
  * @author wubo
  */
-public class SharedReentrantReadWriteLock {
+public class SharedReentrantReadWriteLock2 {
 
-	private Logger logger = LoggerFactory.getLogger(SharedReentrantReadWriteLock.class);
+	private Logger logger = LoggerFactory.getLogger(SharedReentrantReadWriteLock2.class);
 	//分布式锁
 	private InterProcessReadWriteLock lock;
 	private ZookeeperConfig instance;
@@ -39,7 +38,7 @@ public class SharedReentrantReadWriteLock {
 	//放弃检测的开始时间
 	private Long giveUpCheckStartTime;
 	
-	public SharedReentrantReadWriteLock(String lockRootNode) {
+	public SharedReentrantReadWriteLock2(String lockRootNode) {
 		instance = ZookeeperConfig.getInstance();
 		this.lockRootPath = lockRootNode;
 		lock = new InterProcessReadWriteLock(instance.getCuratorFramework(), lockRootNode);
@@ -128,7 +127,7 @@ public class SharedReentrantReadWriteLock {
 			if(judgeGiveUpCheckLock(readWriteCallback)){
 				return readWriteCallback.callback();//建议此处的回调业务在毫秒内完成
 			}else{
-				giveUpCheckStartTime = LockUtil.getCurrentTime();
+				giveUpCheckStartTime = getCurrentTime();
 			}
 		}
 		try {
@@ -170,7 +169,7 @@ public class SharedReentrantReadWriteLock {
 		//放弃检测的开始时间,主要是处理第一次请求为null的情况
 		try {
 			localLock.lock();
-			long currentTime = LockUtil.getCurrentTime();
+			long currentTime = getCurrentTime();
 			giveUpCheckStartTime = giveUpCheckStartTime == null?currentTime:giveUpCheckStartTime;
 			//将TimeUnit单位的放弃检测时间转为毫秒数
 			long checkTime = readWriteCallback.getGiveUpCheckTime();
@@ -184,7 +183,13 @@ public class SharedReentrantReadWriteLock {
 		}
 	}
 
-	
+	/**
+	 * 获取当前时间
+	 * @return
+	 */
+	private long getCurrentTime() {
+		return System.currentTimeMillis();
+	}
 
 	/**
 	 * 放弃检测判断
