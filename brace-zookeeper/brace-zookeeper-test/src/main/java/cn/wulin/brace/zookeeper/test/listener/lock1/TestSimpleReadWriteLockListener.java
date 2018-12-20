@@ -1,4 +1,4 @@
-package cn.wulin.brace.zookeeper.test.lock;
+package cn.wulin.brace.zookeeper.test.listener.lock1;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -7,24 +7,27 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cn.wulin.brace.zookeeper.locks.ReadWriteCallback;
+import cn.wulin.brace.zookeeper.locks.RefreshNotify;
 import cn.wulin.brace.zookeeper.locks.SharedReentrantReadWriteLock;
 
-public class TestSharedReentrantReadWriteLock {
+public class TestSimpleReadWriteLockListener {
 	
 	public static Integer common_testData;
 	
 	public static final String lock = "/locks/rwl";
+	
+	private RefreshNotify listener = new RefreshNotifyListener();
 	//模拟读客户端
-	private SharedReentrantReadWriteLock readClientLock = new SharedReentrantReadWriteLock(TestSharedReentrantReadWriteLock.lock);
+	private SharedReentrantReadWriteLock readClientLock = new SharedReentrantReadWriteLock(TestSimpleReadWriteLockListener.lock);
 	//模拟写客户端
-	private SharedReentrantReadWriteLock writeClientLock = new SharedReentrantReadWriteLock(TestSharedReentrantReadWriteLock.lock);
+	private SharedReentrantReadWriteLock writeClientLock = new SharedReentrantReadWriteLock(TestSimpleReadWriteLockListener.lock,listener);
 			
 	
 	public static void main(String[] args) throws Exception {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("spring-temp1-1.xml");
 		ctx.start();
 		
-		TestSharedReentrantReadWriteLock rwl = new TestSharedReentrantReadWriteLock();
+		TestSimpleReadWriteLockListener rwl = new TestSimpleReadWriteLockListener();
 		final ReadWriteLockTest rwlt = rwl.new ReadWriteLockTest();
 		final ReadWriteLockTest rwlt2 = rwl.new ReadWriteLockTest();
 		
@@ -85,9 +88,9 @@ public class TestSharedReentrantReadWriteLock {
 					try {
 						Thread.sleep(10);
 						testData++;
-						TestSharedReentrantReadWriteLock.common_testData = testData;
+						TestSimpleReadWriteLockListener.common_testData = testData;
 						String name = Thread.currentThread().getName();
-		                System.out.println("client1_"+name+"写入数据 testData:" + testData+",common_testData:"+TestSharedReentrantReadWriteLock.common_testData);
+		                System.out.println("client1_"+name+"写入数据 testData:" + testData+",common_testData:"+TestSimpleReadWriteLockListener.common_testData);
 		                
 		                if(reentrantWrite){
 		                	reentrantWrite = false;
@@ -113,7 +116,7 @@ public class TestSharedReentrantReadWriteLock {
 					try {
 						Thread.sleep(10);
 						String name = Thread.currentThread().getName();
-						 System.out.println("client2_"+name+"读取数据 testData:" + testData+",common_testData:"+TestSharedReentrantReadWriteLock.common_testData);
+						 System.out.println("client2_"+name+"读取数据 testData:" + testData+",common_testData:"+TestSimpleReadWriteLockListener.common_testData);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -125,9 +128,9 @@ public class TestSharedReentrantReadWriteLock {
 					try {
 						Thread.sleep(10);
 						Integer b = testData;
-						testData = TestSharedReentrantReadWriteLock.common_testData;
+						testData = TestSimpleReadWriteLockListener.common_testData;
 						String name = Thread.currentThread().getName();
-						System.out.println("client2_"+name+"重新加载数据  testData_before:" + b+",common_testData:"+TestSharedReentrantReadWriteLock.common_testData+", testData_after:" + testData);
+						System.out.println("client2_"+name+"重新加载数据  testData_before:" + b+",common_testData:"+TestSimpleReadWriteLockListener.common_testData+", testData_after:" + testData);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -138,5 +141,11 @@ public class TestSharedReentrantReadWriteLock {
         }
 
     }
-
+    
+    private static class RefreshNotifyListener extends RefreshNotify{
+		@Override
+		public void doRefreshNotify() {
+			System.out.println("doRefreshNotify");
+		}
+    }
 }

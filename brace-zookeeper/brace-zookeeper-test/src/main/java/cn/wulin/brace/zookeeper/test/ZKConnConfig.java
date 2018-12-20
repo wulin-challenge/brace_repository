@@ -12,7 +12,7 @@ public class ZKConnConfig implements ZkConnection,ApplicationContextAware{
 
 	@Override
 	public String conn(URL url) {
-		return "zxq:2181";
+		return "127.0.0.1:2181";
 	}
 
 	@Override

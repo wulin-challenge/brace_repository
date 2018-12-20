@@ -33,5 +33,22 @@ public class SerializeUtilTest {
 		Param param2 = SerializeUtil.deserialize(data, Param.class,"kryo");
 		System.out.println(param2);
 	}
+	
+	@Test
+	public void kryoSerializeException(){
+		Throwable param = null;
+		try {
+			int i =1/0;
+		} catch (Exception e) {
+			param = e;
+		}
+		byte[] data = SerializeUtil.serialize(param,"kryo");
+		Throwable param2 = SerializeUtil.deserialize(data, Throwable.class,"kryo");
+		////////////////////////////////////////////////////////////////////
+//		byte[] data = SerializeUtil.serialize(param,"fastjson");
+//		Throwable param2 = SerializeUtil.deserialize(data, Throwable.class,"fastjson");
+		System.out.println(param2);
+		
+	}
 
 }

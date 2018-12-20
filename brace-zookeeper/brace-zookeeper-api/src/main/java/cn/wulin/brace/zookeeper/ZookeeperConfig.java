@@ -80,6 +80,10 @@ public class ZookeeperConfig {
 		setNodeListener(rootNode);
 	}
 	
+	public void createRootNode(String rootNode,ZookeeperCuratorEvent zookeeperCuratorEvent){
+		createNode(rootNode, CreateMode.PERSISTENT);//创建根节点
+		setNodeListener(rootNode,zookeeperCuratorEvent);
+	}
 	
 	
 	/**
@@ -133,11 +137,18 @@ public class ZookeeperConfig {
 	 * 设置节点监听
 	 * @param path
 	 */
-	@SuppressWarnings("resource")
 	public void setNodeListener(String path){
-		TreeCache treeCache = new TreeCache(curatorFramework, path);
-		
 		ZookeeperCuratorEvent zookeeperCuratorEvent = new ZookeeperCuratorEventAdapter();
+		setNodeListener(path,zookeeperCuratorEvent);
+	}
+	
+	/**
+	 * 设置节点监听
+	 * @param path
+	 */
+	@SuppressWarnings("resource")
+	public void setNodeListener(String path,ZookeeperCuratorEvent zookeeperCuratorEvent){
+		TreeCache treeCache = new TreeCache(curatorFramework, path);
 		TreeCacheListener treeCacheListener = new ZookeeperCuratorListener(zookeeperCuratorEvent);
 		treeCache.getListenable().addListener(treeCacheListener);
 		try {
