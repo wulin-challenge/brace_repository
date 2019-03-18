@@ -10,10 +10,11 @@
 		<!-- 打包 版本号-->
 		<encoding>UTF-8</encoding>
 		<java.version>1.8</java.version>
-		<!-- 
+		 
 		<nexusAddress>192.168.0.2:81</nexusAddress>
-		-->
+		<!--
 		<nexusAddress>wulin:81</nexusAddress>
+		-->
 		<spring.boot.version>1.5.7.RELEASE</spring.boot.version>
 		
 		<!-- 自身系统的版本号 -->
