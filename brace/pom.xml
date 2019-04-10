@@ -215,5 +215,6 @@
 		<module>brace-core</module>
 		<module>brace-utils</module>
 		<module>brace-common</module>
+		<module>brace-examples</module>
 	</modules>
 </project>
