@@ -12,8 +12,8 @@
 		<encoding>UTF-8</encoding>
 		<java.version>1.8</java.version>
 
-<!-- 		<nexusAddress>192.168.0.2:81</nexusAddress> -->
-		<nexusAddress>wulin:81</nexusAddress>
+		<nexusAddress>192.168.2.3:8081</nexusAddress>
+<!-- 		<nexusAddress>wulin:81</nexusAddress> -->
 		<spring.boot.version>1.5.7.RELEASE</spring.boot.version>
 
 		<!-- 自身系统的版本号 -->
@@ -36,6 +36,20 @@
 	</properties>
 
 	<!-- deploy -->
+<!-- 	<distributionManagement> -->
+<!-- 		<repository> -->
+<!-- 			<id>nexus-releases</id> -->
+<!-- 			<name>nexus releases Repository</name> -->
+<!-- 			<url>http://${nexusAddress}/nexus/content/repositories/releases/</url> -->
+<!-- 		</repository> -->
+<!-- 		<snapshotRepository> -->
+<!-- 			<id>nexus-snapshots</id> -->
+<!-- 			<name>nexus snapshot Repository</name> -->
+<!-- 			<url>http://${nexusAddress}/nexus/content/repositories/snapshots/</url> -->
+<!-- 		</snapshotRepository> -->
+<!-- 	</distributionManagement> -->
+
+<!-- deploy -->
 	<distributionManagement>
 		<repository>
 			<id>nexus-releases</id>
@@ -45,7 +59,7 @@
 		<snapshotRepository>
 			<id>nexus-snapshots</id>
 			<name>nexus snapshot Repository</name>
-			<url>http://${nexusAddress}/nexus/content/repositories/snapshots/</url>
+			<url>http://${nexusAddress}/nexus/content/repositories/${branch}/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
