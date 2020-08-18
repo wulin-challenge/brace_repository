@@ -2,14 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>cn.wulin</groupId>
-    <artifactId>brace</artifactId>
+    <artifactId>brace-demo-parent</artifactId>
     <version>1.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>brace-demo-parent</artifactId>
-  <packaging>pom</packaging>
-  <description>各种案例的demo</description>
-  <modules>
-  	<module>brace-demo-email</module>
-  	<module>brace-demo-comprehensive</module>
-  </modules>
+  <artifactId>brace-demo-comprehensive</artifactId>
+  <description>综合性的案例demo</description>
 </project>
