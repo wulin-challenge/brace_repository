@@ -11,5 +11,6 @@
   <modules>
   	<module>brace-demo-email</module>
   	<module>brace-demo-comprehensive</module>
+  	<module>brace-demo-reactor</module>
   </modules>
 </project>
