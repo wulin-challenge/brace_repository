@@ -34,6 +34,7 @@
 		<log4j.version>1.2.16</log4j.version>
 		<logback.version>1.2.2</logback.version>
 		<guava.version>23.0</guava.version>
+		<hutool.version>4.1.21</hutool.version>
 	</properties>
 
 	<!-- deploy -->
@@ -66,6 +67,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>cn.hutool</groupId>
+				<artifactId>hutool-http</artifactId>
+				<version>${hutool.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
@@ -165,9 +171,12 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-http</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>${guava.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.wulin</groupId>
@@ -302,5 +311,6 @@
 		<module>brace-common</module>
 		<module>brace-examples</module>
 		<module>brace-demo-parent</module>
+		<module>brace-spring-redis-extension</module>
 	</modules>
 </project>
