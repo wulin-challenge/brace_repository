@@ -13,5 +13,8 @@
   	<module>brace-demo-comprehensive</module>
   	<module>brace-demo-reactor</module>
   	<module>brace-demo-multi-extends</module>
+  	<module>brace-demo-annotation-processor</module>
+  	<module>brace-demo-annotation-processor-test-extends</module>
+  	<module>brace-demo-starter-jar</module>
   </modules>
 </project>

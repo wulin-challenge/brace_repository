@@ -31,7 +31,8 @@ public class DistributedLockDemo {
     @Before
     public void init() throws Exception {
         // 设置 ZooKeeper 服务地址为本机的 2181 端口
-        connectString = "zxq:2181";
+//        connectString = "zxq:2181";
+        connectString = "127.0.0.1:2181";
         // 重试策略
         // 初始休眠时间为 1000ms, 最大重试次数为 3
         retry = new ExponentialBackoffRetry(1000, 3);
