@@ -16,5 +16,7 @@
   	<module>brace-demo-annotation-processor</module>
   	<module>brace-demo-annotation-processor-test-extends</module>
   	<module>brace-demo-starter-jar</module>
+  	<module>brace-demo-byte-buddy</module>
+  	<module>brace-demo-byte-agent</module>
   </modules>
 </project>

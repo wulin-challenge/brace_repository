@@ -1,7 +1,5 @@
 package cn.wulin.brace.utils.impl;
 
-import java.io.File;
-
 import org.apache.commons.lang3.StringUtils;
 
 import cn.wulin.brace.utils.PathUtil;
@@ -56,8 +54,6 @@ public class JarPathImpl {
 	 */
 	private String getClasspath() {
 		String classpath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-
-		System.out.println("claspath1: " + classpath);
 		return PathUtil.replaceSprit(replaceMark(classpath));
 	}
 

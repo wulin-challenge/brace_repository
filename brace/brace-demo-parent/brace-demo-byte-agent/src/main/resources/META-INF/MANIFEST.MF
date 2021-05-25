@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: brace-demo-byte-agent
+Premain-Class: org.wulin.brace.demo.bytes.agent.TimerAgent
+Implementation-Version: 1.0.1-SNAPSHOT
+Built-By: ThinkPad
+Specification-Title: brace-demo-byte-agent
+Implementation-Vendor-Id: cn.wulin
+Created-By: Apache Maven 3.5.3
+Build-Jdk: 1.8.0_221
+Specification-Version: 1.0
+
