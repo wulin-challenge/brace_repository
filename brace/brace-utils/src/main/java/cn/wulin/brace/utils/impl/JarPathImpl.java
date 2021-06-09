@@ -3,6 +3,8 @@ package cn.wulin.brace.utils.impl;
 import org.apache.commons.lang3.StringUtils;
 
 import cn.wulin.brace.utils.PathUtil;
+import cn.wulin.ioc.logging.Logger;
+import cn.wulin.ioc.logging.LoggerFactory;
 
 /**
  * 得到启动jar的实现类
@@ -10,6 +12,51 @@ import cn.wulin.brace.utils.PathUtil;
  *
  */
 public class JarPathImpl {
+	private static final Logger LOGGER = LoggerFactory.getLogger(JarPathImpl.class);
+	
+	private Class<?> starterClass;
+	
+	
+	public JarPathImpl(Class<?> starterClass) {
+		super();
+		this.starterClass = starterClass;
+	}
+	
+
+	public JarPathImpl() {
+		this(getMainClass());
+	}
+	
+	/**
+	 * 获取启动类
+	 * @return
+	 */
+	public static Class<?> getMainClass(){
+		Class<?> forName = null;
+		try {
+			String mainClassName = getMainClassName();
+			forName = Class.forName(mainClassName);
+		} catch (ClassNotFoundException e) {
+			LOGGER.error("启动类没有找到",e);
+		}
+		return forName;
+	}
+	
+	/**
+	 * 获取启动类全限定名称
+	 * @return
+	 */
+	public static String getMainClassName() {
+		StackTraceElement[] stackTraceElements = new RuntimeException().getStackTrace();
+		for (StackTraceElement stackTraceElement : stackTraceElements) {
+			if ("main".equals(stackTraceElement.getMethodName())) {
+				return stackTraceElement.getClassName();
+			}
+		}
+		return "";
+	}
+
+
 	/**
 	 * 得到jar文件
 	 * <p>
@@ -26,13 +73,40 @@ public class JarPathImpl {
 		String rootDirectory = getRootDirectory();
 		String classpath = getClasspath();
 
-		int classPathIndex = classpath.indexOf(rootDirectory) + rootDirectory.length() + 1;
-		String jarSuffix = classpath.substring(classPathIndex);
-
-		int index = jarSuffix.indexOf("/");
-		String jarName = jarSuffix.substring(0, index);
+		String jarSuffix = getJarSuffix(rootDirectory, classpath);
+		String jarName = getJarName(jarSuffix);
 		String jarPath = PathUtil.pathSplicing(rootDirectory, jarName);
 		return jarPath;
+	}
+
+	/**
+	 * 得到jar的名称
+	 * <p> 主要的情况有 jarname.jar/xxx
+	 * <p> jarname.jar
+	 * @param jarSuffix
+	 * @return
+	 */
+	private String getJarName(String jarSuffix) {
+		if(StringUtils.isBlank(jarSuffix)) {
+			throw new RuntimeException("没有获取到jar文件");
+		}
+		if(jarSuffix.contains("/")) {
+			int index = jarSuffix.indexOf("/");
+			return jarSuffix.substring(0, index);
+		}
+		return jarSuffix;
+	}
+
+	/**
+	 * 过期jar文件前缀
+	 * @param rootDirectory
+	 * @param classpath
+	 * @return
+	 */
+	private String getJarSuffix(String rootDirectory, String classpath) {
+		int classPathIndex = classpath.indexOf(rootDirectory) + rootDirectory.length() + 1;
+		String jarSuffix = classpath.substring(classPathIndex);
+		return jarSuffix;
 	}
 	
 	/**
@@ -53,7 +127,7 @@ public class JarPathImpl {
 	 * @return
 	 */
 	private String getClasspath() {
-		String classpath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+		String classpath = starterClass.getProtectionDomain().getCodeSource().getLocation().getPath();
 		return PathUtil.replaceSprit(replaceMark(classpath));
 	}
 
@@ -73,7 +147,7 @@ public class JarPathImpl {
 	 * @return
 	 */
 	private String getJarPathOfMark() {
-		String classpath = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+		String classpath = starterClass.getProtectionDomain().getCodeSource().getLocation().getPath();
 		classpath = PathUtil.replaceSprit(classpath);
 		
 		if (!classpath.contains("!")) {

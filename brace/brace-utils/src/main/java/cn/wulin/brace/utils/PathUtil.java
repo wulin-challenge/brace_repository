@@ -83,4 +83,13 @@ public class PathUtil {
 	public static String getJarPath() {
 		return new JarPathImpl().getJarPath();
 	}
+	
+	/**
+	 * 得到启动jar文件的路径
+	 * @param clazz 启动类的class
+	 * @return
+	 */
+	public static String getJarPath(Class<?> clazz) {
+		return new JarPathImpl(clazz).getJarPath();
+	}
 }

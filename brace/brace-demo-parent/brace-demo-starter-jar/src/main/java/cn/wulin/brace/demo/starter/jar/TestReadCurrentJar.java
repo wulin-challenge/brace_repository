@@ -16,11 +16,11 @@ import cn.wulin.brace.utils.PathUtil;
  */
 public class TestReadCurrentJar {
 
-	public static void main(String[] args) {
-		String jarPath = new TestReadCurrentJar().getJarPath();
-		System.out.println("jar文件的路径---------------------------");
-		System.out.println(jarPath);
-	}
+//	public static void main(String[] args) {
+//		String jarPath = new TestReadCurrentJar().getJarPath();
+//		System.out.println("jar文件的路径---------------------------");
+//		System.out.println(jarPath);
+//	}
 
 	/**
 	 * 得到启动项目的所在根目录

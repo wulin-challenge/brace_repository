@@ -50,6 +50,13 @@
       <version>1.2</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>com.sun</groupId>
+      <artifactId>tools</artifactId>
+      <version>1.8</version>
+      <scope>system</scope>
+      <systemPath>${JAVA_HOME}/lib/tools.jar</systemPath>
+    </dependency>
   </dependencies>
   <properties>
     <premain.class>org.wulin.brace.demo.bytes.agent.TimerAgent</premain.class>
