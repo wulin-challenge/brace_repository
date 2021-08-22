@@ -18,5 +18,7 @@
   	<module>brace-demo-starter-jar</module>
   	<module>brace-demo-byte-buddy</module>
   	<module>brace-demo-byte-agent</module>
+  	<module>brace-demo-spring-boot-buddy</module>
+  	<module>brace-demo-unrar</module>
   </modules>
 </project>

@@ -1,6 +1,8 @@
 package cn.wulin.brace.demo.comprehensive.obtain_jar;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 import cn.wulin.brace.utils.PathUtil;
@@ -16,6 +18,7 @@ public class ObtainStartMain implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		
 		String mainClassName = getMainClassName();
 		Class<?> forName = Class.forName(mainClassName);
 		

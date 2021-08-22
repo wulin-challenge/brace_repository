@@ -1,0 +1,3 @@
+# Application Context Initializers
+org.springframework.context.ApplicationContextInitializer=\
+cn.wulin.brace.demo.spring.boot.buddy.BuddyInitializer

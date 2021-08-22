@@ -22,6 +22,11 @@
 			<artifactId>brace-demo-comprehensive</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>cn.wulin</groupId>
+			<artifactId>brace-demo-spring-boot-buddy</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
 
 	</dependencies>
 
@@ -34,12 +39,16 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
+						<manifestEntries>
+							<build-time>${buildTimeKey}</build-time>
+							<build-version>${build-version}</build-version>
+						</manifestEntries>
 						<manifest>
-<!-- 							<addClasspath>true</addClasspath> -->
+							<!-- <addClasspath>true</addClasspath> -->
 							<!-- MANIFEST.MF 中 Class-Path 加入前缀 -->
-<!-- 							<classpathPrefix>lib/</classpathPrefix> -->
+							<!-- <classpathPrefix>lib/</classpathPrefix> -->
 							<!-- jar包不包含唯一版本标识 -->
-<!-- 							<useUniqueVersions>true</useUniqueVersions> -->
+							<!-- <useUniqueVersions>true</useUniqueVersions> -->
 							<!-- 指定入口类 -->
 							<mainClass>cn.wulin.brace.demo.starter.jar.SpringStarter</mainClass>
 						</manifest>
@@ -72,7 +81,24 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.4</version>
+				<configuration>
+					<timestampFormat>yyyy-MM-dd HH:mm:ss</timestampFormat>
+					<timestampPropertyName>buildTimeKey</timestampPropertyName>
+				</configuration>
+				<executions>
+					<execution>
+						<id>create-timestamp</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>create-timestamp</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 
 

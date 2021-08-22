@@ -1,1 +1,1 @@
-mvn clean install -Dmaven.test.skip=true -Dmaven.javadoc.skip=true
+mvn clean install -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dbuild-version=1.1.0-release
