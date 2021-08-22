@@ -8,7 +8,7 @@ public class PinyinTest {
 
 	public static void main(String[] args) throws Exception {
 		
-		String ch = "新a精讲，项目驱动落地，分布式事务拔高";
+		String ch = "一站式学习a网络编程 全面理解";
 		Set<String> hanyuToPy = PinYinUtil.hanyuToPy(ch," ");
 		for (String string : hanyuToPy) {
 			System.out.println(string);

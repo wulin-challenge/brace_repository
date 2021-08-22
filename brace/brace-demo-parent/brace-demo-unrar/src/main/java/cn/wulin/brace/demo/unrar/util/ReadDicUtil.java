@@ -17,6 +17,11 @@ public class ReadDicUtil {
 	private final static Logger LOGGER = LoggerFactory.getLogger(ReadDicUtil.class); 
 	private final static String PWD_DIC_PATH = System.getProperty("user.dir")+"/config/pwd.dic";
 	private final static String BLANK_REGEX = "[ ]+";
+	
+	/**
+	 * 字典注释
+	 */
+	private final static String DIC_ANNOTATION = "--";
 
 	/**
 	 * 读取字典集合
@@ -29,7 +34,7 @@ public class ReadDicUtil {
 		try {
 			List<String> readLines = FileUtils.readLines(new File(PWD_DIC_PATH), Charset.forName("UTF-8"));
 			for (String line : readLines) {
-				if(StringUtils.isBlank(line)) {
+				if(StringUtils.isBlank(line) || line.startsWith(DIC_ANNOTATION)) {
 					continue;
 				}
 				

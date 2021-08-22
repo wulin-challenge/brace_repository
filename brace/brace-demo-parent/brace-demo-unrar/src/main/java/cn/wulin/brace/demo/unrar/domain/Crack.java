@@ -1,5 +1,7 @@
 package cn.wulin.brace.demo.unrar.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 public class Crack {
 	/**
 	 * 破解密码
@@ -11,8 +13,13 @@ public class Crack {
 	 */
 	private Boolean crack = false;
 	
+	@JSONField(serialize = false)
 	private String filePath;
 	
+	public Crack() {
+		super();
+	}
+
 	public Crack(String password, String filePath) {
 		super();
 		this.password = password;

@@ -1,8 +1,6 @@
 package cn.wulin.brace.demo.unrar.service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -13,10 +11,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cn.wulin.brace.demo.unrar.dao.UnrarRepository;
 import cn.wulin.brace.demo.unrar.domain.Crack;
 import cn.wulin.brace.demo.unrar.domain.CrackPassword;
 import cn.wulin.brace.demo.unrar.domain.Unrar;
 import cn.wulin.brace.demo.unrar.domain.UnrarConfigParam;
+import cn.wulin.brace.demo.unrar.exception.BlockQueueExecutionHandler;
 import cn.wulin.brace.demo.unrar.helper.CrackPasswordGenerator;
 import cn.wulin.brace.demo.unrar.helper.CrackPasswordGenerators;
 import cn.wulin.brace.demo.unrar.helper.UnrarHelper;
@@ -30,7 +30,7 @@ import cn.wulin.brace.utils.ThreadFactoryImpl;
  */
 public class UnrarService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnrarService.class);
-	private final static ThreadPoolExecutor EXECUTORS = new ThreadPoolExecutor(10, 10,0L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>(1000000),new ThreadFactoryImpl("UnrarService"));
+	private final static ThreadPoolExecutor EXECUTORS = new ThreadPoolExecutor(10, 10,0L, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>(1000000),new ThreadFactoryImpl("UnrarService"),new BlockQueueExecutionHandler());
 	
 	/**
 	 * 破解密码的参数配置
@@ -80,6 +80,12 @@ public class UnrarService {
 		this.toCrackFilePath = toCrackFilePath;
 		this.unrarHelper = new UnrarHelper(unrarConfigParam.getCommand());
 		generators.getGenerators().addAll(getPwdGenerators());
+		
+		//从本地初始化到内存
+		if(unrarConfigParam.getNativeCache()) {
+			UnrarRepository.getInstance().initCacheFromLocal(toCrackFilePath);
+		}
+		
 	}
 	
 	/**
@@ -94,12 +100,22 @@ public class UnrarService {
 	 * 开始启动生产者线程
 	 */
 	private void startProductThread() {
-
-		Thread productThread = new Thread(()-> {
+		
+		ThreadFactoryImpl threadFactory = new ThreadFactoryImpl("UnrarProduct");
+		Thread productThread = threadFactory.newThread(()-> {
 			while(generators.garentedPwd()) {
 				if(executeSuccess) {
 					threadCount.countDown();
 					break;
+				}
+				//从内存中判断是否已经存在
+				String pwdString = generators.getPwdString();
+				
+				if(unrarConfigParam.getNativeCache()) {
+					boolean flag = UnrarRepository.getInstance().contains(pwdString);
+					if(flag) {
+						continue;
+					}
 				}
 				
 				submitTask();
@@ -135,9 +151,14 @@ public class UnrarService {
 				threadCount.countDown();
 				return;
 			}
+			//写缓存
+			if(unrarConfigParam.getNativeCache()) {
+				UnrarRepository.getInstance().saveOrUpdate(crack,true,true);
+			}
 			
+			long taskCount = consumerTaskCount.incrementAndGet();
 			//判断是否为最后的消费任务
-			if(productComplete && consumerTaskCount.incrementAndGet() == generators.getCount()) {
+			if(productComplete && taskCount == generators.getCount()) {
 				crackResult.setEndTime(System.currentTimeMillis());
 				crackResult.setCreateText("本次破解已完成,但没有获取到破解密码!");
 				
@@ -158,12 +179,10 @@ public class UnrarService {
 		if(!unrarConfigParam.getPrint()) {
 			return;
 		}
-		
 		Long startTime = crackResult.getStartTime();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
-		String startTimeString = sdf.format(new Date(startTime));
+		long endTime = System.currentTimeMillis();
 		
-		System.out.println(startTimeString+"<->"+consumerCount+"<-->"+crack.getPassword());
+		System.out.println((endTime-startTime)+"<--->"+consumerCount+"<-->"+crack.getPassword());
 		if(crack.getCrack()) {
 			System.out.println("成功破解,解压密码为:"+crack.getPassword());
 		}

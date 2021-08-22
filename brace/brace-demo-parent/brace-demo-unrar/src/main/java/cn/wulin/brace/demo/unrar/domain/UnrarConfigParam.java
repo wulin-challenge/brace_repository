@@ -21,6 +21,11 @@ public class UnrarConfigParam {
 	 */
 	private Boolean addMergeDic = true;
 	
+	/**
+	 * 是否启用本地缓存
+	 */
+	private Boolean nativeCache = true;
+	
 	public UnrarConfigParam(int minLength, int maxLength) {
 		super();
 		this.minLength = minLength;
@@ -80,6 +85,14 @@ public class UnrarConfigParam {
 
 	public void setAddMergeDic(Boolean addMergeDic) {
 		this.addMergeDic = addMergeDic;
+	}
+
+	public Boolean getNativeCache() {
+		return nativeCache;
+	}
+
+	public void setNativeCache(Boolean nativeCache) {
+		this.nativeCache = nativeCache;
 	}
 	
 }
