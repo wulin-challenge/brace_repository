@@ -9,6 +9,11 @@ public class UnrarConfigParam {
 	private String[] pwd = new String[0];
 	private int minLength;
 	private int maxLength;
+	
+	/**
+	 * 当前密码字典长度小于指定的最大长度时,最大长度使用字典的实际最大长度
+	 */
+	private Boolean pwdDicMaxLength = true;
 	private String command = "D:\\software\\generalSoftware\\7-zip\\install\\7z.exe";
 	
 	/**
@@ -93,6 +98,14 @@ public class UnrarConfigParam {
 
 	public void setNativeCache(Boolean nativeCache) {
 		this.nativeCache = nativeCache;
+	}
+
+	public Boolean getPwdDicMaxLength() {
+		return pwdDicMaxLength;
+	}
+
+	public void setPwdDicMaxLength(Boolean pwdDicMaxLength) {
+		this.pwdDicMaxLength = pwdDicMaxLength;
 	}
 	
 }

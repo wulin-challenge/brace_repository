@@ -13,11 +13,12 @@ public class MultiPwdCrackStarter {
 	private static final String command = "D:\\software\\generalSoftware\\7-zip\\install\\7z.exe";
 	
 	public static void main(String[] args) {
-		String filePath = "E:\\resources\\download\\xunlei_download\\crackdict\\bbb.zip";
+		String filePath = "E:\\resources\\download\\xunlei_download\\crackdict\\aaa.rar";
 		UnrarConfigParam param = new UnrarConfigParam(1, 5);
 		param.setCommand(command);
-		param.setAddMergeDic(false);
-		param.setNativeCache(false);
+		param.setAddMergeDic(true);
+		param.setNativeCache(true);
+		param.setPwdDicMaxLength(true);
 		
 		UnrarService service = new UnrarService(param, filePath);
 		

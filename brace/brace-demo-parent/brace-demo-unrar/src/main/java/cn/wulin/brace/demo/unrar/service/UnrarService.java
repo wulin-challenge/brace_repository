@@ -114,11 +114,18 @@ public class UnrarService {
 				if(unrarConfigParam.getNativeCache()) {
 					boolean flag = UnrarRepository.getInstance().contains(pwdString);
 					if(flag) {
+						//这里必须将生成的计算减去1,否则与后面的计算将不等
+						generators.getCount().decrementAndGet();
 						continue;
 					}
 				}
 				
 				submitTask();
+			}
+			//表示没有执行任务,必须在减一
+			if(generators.getCount().get() == 0) {
+				crackResult.setCreateText("没有任何执行任务");
+				threadCount.countDown();
 			}
 			productComplete = true;
 			threadCount.countDown();
@@ -153,12 +160,12 @@ public class UnrarService {
 			}
 			//写缓存
 			if(unrarConfigParam.getNativeCache()) {
-				UnrarRepository.getInstance().saveOrUpdate(crack,true,true);
+				UnrarRepository.getInstance().saveOrUpdate(crack,true,false);
 			}
 			
 			long taskCount = consumerTaskCount.incrementAndGet();
 			//判断是否为最后的消费任务
-			if(productComplete && taskCount == generators.getCount()) {
+			if(productComplete && taskCount == generators.getCount().get()) {
 				crackResult.setEndTime(System.currentTimeMillis());
 				crackResult.setCreateText("本次破解已完成,但没有获取到破解密码!");
 				
@@ -199,8 +206,10 @@ public class UnrarService {
 			
 			//若果实际字典长度小于指定最大长度,则使用字典的实际长度作为最大长度
 			int maxLength = unrarConfigParam.getMaxLength();
-			if(pwdDic.length < unrarConfigParam.getMaxLength()) {
-				maxLength = pwdDic.length;
+			if(unrarConfigParam.getPwdDicMaxLength()) {
+				if(pwdDic.length < unrarConfigParam.getMaxLength()) {
+					maxLength = pwdDic.length;
+				}
 			}
 			
 			CrackPassword newCrack = new CrackPassword(unrarConfigParam.getPwd(),unrarConfigParam.getMinLength(), maxLength);

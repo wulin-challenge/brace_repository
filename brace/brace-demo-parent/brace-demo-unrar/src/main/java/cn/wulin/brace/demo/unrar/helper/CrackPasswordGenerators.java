@@ -60,8 +60,8 @@ public class CrackPasswordGenerators {
 	 * 得到当前的执行计数
 	 * @return
 	 */
-	public Long getCount() {
-		return count.get();
+	public AtomicLong getCount() {
+		return count;
 	}
 
 	public List<CrackPasswordGenerator> getGenerators() {

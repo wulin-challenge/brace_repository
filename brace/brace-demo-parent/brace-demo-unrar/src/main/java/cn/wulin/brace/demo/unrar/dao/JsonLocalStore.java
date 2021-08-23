@@ -142,6 +142,9 @@ public class JsonLocalStore<T> {
 	}
 	
 	private boolean writeLine(File jsonFile,List<Object> dataList,boolean append) {
+		if(dataList == null || dataList.size() == 0) {
+			return false;
+		}
 		List<String> lines = new ArrayList<>();
 		for (Object object : dataList) {
 			String json = JSON.toJSONString(object);
