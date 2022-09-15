@@ -8,6 +8,8 @@ import cn.wulin.brace.jdk.compiler3.CompilerLoaderUtil3;
 
 /**
  * 测试内存编译
+ * <p> compiler1,compiler2 暂时还不可用
+ * <p> compiler3 完全可用
  * 
  * @author ThinkPad
  *
