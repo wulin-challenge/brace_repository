@@ -20,5 +20,6 @@
   	<module>brace-demo-byte-agent</module>
   	<module>brace-demo-spring-boot-buddy</module>
   	<module>brace-demo-unrar</module>
+  	<module>brace-demo-ip-region</module>
   </modules>
 </project>

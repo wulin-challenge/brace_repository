@@ -40,8 +40,8 @@ public class PwdCalculationTest {
 	 */
 	@Test
 	public void pwdCalculationFormulaTest() {
-		double n = 15d;
-		double m = 5d;
+		double n = 72d;
+		double m = 8d;
 		
 		double count = 0d;
 		for (int i = 0; i < m; i++) {
