@@ -1,0 +1,37 @@
+sql: 
+  script:
+    paths: 
+      - classpath*:scripts/init_script.xml
+
+
+spring:
+  ####### database Config #######
+  datasource:
+    druid:
+      connection-init-sqls: set names utf8mb4
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      test-while-idle: false
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://192.168.0.208:3306/baozang?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true&useLegacyDatetimeCode=false
+    username: root
+    password: 123456789
+  application:
+    name: brace-sql-script-examples
+#    freemarker:
+#        allow-request-override: false
+#        allow-session-override: false
+#        cache: false
+#        charset: UTF-8
+#        check-template-location: true
+#        content-type: text/html
+#        enabled: true
+#        expose-request-attributes: false
+#        expose-session-attributes: false
+#        expose-spring-macro-helpers: true
+#        prefer-file-system-access: true
+#        suffix: .ftl
+##        template-loader-path: classpath*:/templates/
+#        settings:
+#            template_update_delay: 0
+#            default_encoding: UTF-8
+#            classic_compatible: true

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sql database="mysql">
+	<command type="script" name="init_script" table="">
+		<![CDATA[
+			INSERT INTO `sys_config`(`id`,`website_code`, `config_key`, `config_value`, `create_time`, `update_time`) VALUES (${replaceNumberSequence('findConfigMaxId')},  '${params.websiteCode}', 'homeDesc', '${replaceMapCache('findByMap').config_value}', now(), now());
+			INSERT INTO `sys_config`(`id`,`website_code`, `config_key`, `config_value`, `create_time`, `update_time`) VALUES (${replaceNumberSequence('findConfigMaxId')},  '${params.websiteCode}', 'homeKeywords', 'OneBlog,开源博客', now(), now());
+			INSERT INTO `sys_config`(`id`,`website_code`, `config_key`, `config_value`, `create_time`, `update_time`) VALUES (${replaceNumberSequence('findConfigMaxId')},  '${params.websiteCode}', 'domain', 'zhyd.me', now(), now());
+		]]>
+	</command>
+	
+	<command type="select" name="findConfigMaxId" table="" returnType="number">
+		<![CDATA[
+			select (max(sc.id)+1) as maxId from sys_config sc
+		]]>
+	</command>
+	
+	<command type="select" name="findByMap" table="" returnType="map">
+		<![CDATA[
+			select * from sys_config where website_code = 'baozang' and config_key='homeDesc';
+		]]>
+	</command>
+	
+</sql>

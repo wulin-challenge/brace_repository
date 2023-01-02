@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sql database="oracle">
+	<command type="index" name="indx_zfid_cjrq" table="t_punishment">
+		<![CDATA[
+			-- 创建t_punishment 索引
+			create  index indx_zfid_cjrq 
+			on t_punishment(dqxxid,cjrq) 
+			tablespace ${tableSpase}
+		]]>
+	</command>
+	
+	
+	<command type="function" name="get_zxxq" table="">
+		<![CDATA[
+		--创建获得执行刑期的函数
+		create or replace function get_zxxq(zfid in varchar2,jzrq in date) return varchar2
+		--该函数是用于获得执行刑期的,通过罪犯id和截止日期
+		as
+		r_zxxq varchar2(100);
+		zfid2  varchar2(100) :=zfid;
+		jzrq2 Date := TO_DATE(to_char(jzrq,'yyyy/MM/dd'),'yyyy/MM/dd');  
+		begin
+		  select p4.bdhxq into r_zxxq from (
+		    select rownum as rowNumber ,p3.* from (
+		        select p2.cjrq,p2.bdhxq from t_punishment p2 where p2.dqxxid = zfid2 and p2.cjrq <= jzrq2 order by p2.cjrq desc
+		     ) p3
+		   ) p4 where p4.rowNumber = 1;
+		   return r_zxxq;
+		end get_zxxq;
+		]]>
+	</command>
+</sql>

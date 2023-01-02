@@ -322,5 +322,7 @@
 		<module>brace-examples</module>
 		<module>brace-demo-parent</module>
 		<module>brace-spring-redis-extension</module>
+		<module>brace-sql-script</module>
+		<module>brace-sql-script-examples</module>
 	</modules>
 </project>
