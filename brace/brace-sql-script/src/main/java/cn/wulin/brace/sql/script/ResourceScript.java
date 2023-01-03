@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -198,8 +199,12 @@ public class ResourceScript implements InitializingBean{
 		
 		String parseScript = engine.parseScript(engineParam);
 		
+		if(StringUtils.isBlank(parseScript)) {
+			throw new RuntimeException("freemarker 执行失败!");
+		}
+		
 		try (Connection connection = jdbcTemplate.getDataSource().getConnection();){
-			ScriptUtils.executeSqlScript(connection, parseScript,new SingleSql() {
+			ScriptUtils.executeSqlScript(connection, parseScript,new String[] {"--","#"},new SingleSql() {
 				@Override
 				public String sql(String execSql) {
 					execSql = execSql.replaceAll("\\%\\{", "\\$\\{");

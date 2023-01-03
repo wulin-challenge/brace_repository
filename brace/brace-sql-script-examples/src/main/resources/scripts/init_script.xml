@@ -2,9 +2,12 @@
 <sql database="mysql">
 	<command type="script" name="init_script" table="">
 		<![CDATA[
-			INSERT INTO `sys_config`(`id`,`website_code`, `config_key`, `config_value`, `create_time`, `update_time`) VALUES (${replaceNumberSequence('findConfigMaxId')},  '${params.websiteCode}', 'homeDesc', '${replaceMapCache('findByMap').config_value}', now(), now());
+			INSERT INTO `sys_config`(`id`,`website_code`, `config_key`, `config_value`, `create_time`, `update_time`) VALUES (${replaceNumberSequence('findConfigMaxId')},  '${params.websiteCode}', 'homeDesc', '${setGetVariable('homeDesc:key',replaceMapCache('findByMap').config_value)}', now(), now());
 			INSERT INTO `sys_config`(`id`,`website_code`, `config_key`, `config_value`, `create_time`, `update_time`) VALUES (${replaceNumberSequence('findConfigMaxId')},  '${params.websiteCode}', 'homeKeywords', 'OneBlog,开源博客', now(), now());
 			INSERT INTO `sys_config`(`id`,`website_code`, `config_key`, `config_value`, `create_time`, `update_time`) VALUES (${replaceNumberSequence('findConfigMaxId')},  '${params.websiteCode}', 'domain', 'zhyd.me', now(), now());
+		
+		    # ${getVariable('homeDesc:key')}
+		
 		]]>
 	</command>
 	

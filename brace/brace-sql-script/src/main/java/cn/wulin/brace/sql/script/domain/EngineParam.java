@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import cn.hutool.core.lang.UUID;
 import cn.wulin.brace.sql.script.FreemarkerEngine;
 import cn.wulin.brace.sql.script.ResourceScript;
 
@@ -45,7 +47,53 @@ public class EngineParam {
 		number = replaceNumber(name);
 		params.put(key, number);
 		return number;
+	}
+	
+	/**
+	 * 通过别名获取缓存的值
+	 * @param name
+	 * @param alias
+	 * @return
+	 */
+	public Long getNumberByAlias(String name,String alias) {
+		String aliasKey = this.name+":"+name+":replaceNumber:sequence:alias:"+alias;
+		Long number = (Long) params.get(aliasKey);
 		
+		if(params.containsKey(aliasKey) && number != null) {
+			return number;
+		}
+		return null;
+	}
+	
+	/**
+	 * 在执行脚本前替换,后面的数字自增1
+	 * @param name 脚本名称
+	 * @param alias 当前序列值的别名
+	 * @return
+	 */
+	public Long replaceNumberSequence(String name,String alias) {
+		String key = this.name+":"+name+":replaceNumber:sequence";
+		String aliasKey = this.name+":"+name+":replaceNumber:sequence:alias:"+alias;
+		Long number = (Long) params.get(key);
+		if(params.containsKey(key) && number != null) {
+			number++;
+			params.put(key, number);
+			
+			//缓存别名对应的值
+			if(StringUtils.isNotBlank(alias)) {
+				params.put(aliasKey, number);
+			}
+			return number;
+		}
+		
+		number = replaceNumber(name);
+		params.put(key, number);
+		
+		//缓存别名对应的值
+		if(StringUtils.isNotBlank(alias)) {
+			params.put(aliasKey, number);
+		}
+		return number;
 	}
 	
 	/**
@@ -77,6 +125,7 @@ public class EngineParam {
 		EngineParam engineParam = new EngineParam();
 		engineParam.setName(name);
 		engineParam.setCurrentScripts(currentScripts);
+		engineParam.getParams().putAll(this.getParams());
 		String selectSql = ENGINE.parseScript(engineParam);
 		
 		JdbcTemplate jdbcTemplate = ResourceScript.getBeanFactory2().getBean(JdbcTemplate.class);
@@ -87,6 +136,48 @@ public class EngineParam {
 			LOGGER.error("replaceNumber 执行数据库失败!",e);
 		}
 		return number;
+	}
+	
+	/**
+	 * 设置变量,并且返回当前值
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public Object setGetVariable(String key,Object value) {
+		String key2 = this.name+":setGetVariable:"+key;
+		params.put(key2, value);
+		return value;
+	}
+	
+	/**
+	 * 设置变量,并且返回当前值
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public void setVariable(String key,Object value) {
+		String key2 = this.name+":setGetVariable:"+key;
+		params.put(key2, value);
+	}
+	
+	/**
+	 * 获得变量
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public Object getVariable(String key) {
+		String key2 = this.name+":setGetVariable:"+key;
+		return params.get(key2);
+	}
+	
+	/**
+	 * 得到uuid
+	 * @return
+	 */
+	public String getUuid() {
+		return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
 	}
 	
 	/**
@@ -114,6 +205,7 @@ public class EngineParam {
 		EngineParam engineParam = new EngineParam();
 		engineParam.setName(name);
 		engineParam.setCurrentScripts(currentScripts);
+		engineParam.getParams().putAll(this.getParams());
 		String selectSql = ENGINE.parseScript(engineParam);
 		
 		JdbcTemplate jdbcTemplate = ResourceScript.getBeanFactory2().getBean(JdbcTemplate.class);
@@ -152,6 +244,7 @@ public class EngineParam {
 		EngineParam engineParam = new EngineParam();
 		engineParam.setName(name);
 		engineParam.setCurrentScripts(currentScripts);
+		engineParam.getParams().putAll(this.getParams());
 		String selectSql = ENGINE.parseScript(engineParam);
 		
 		JdbcTemplate jdbcTemplate = ResourceScript.getBeanFactory2().getBean(JdbcTemplate.class);

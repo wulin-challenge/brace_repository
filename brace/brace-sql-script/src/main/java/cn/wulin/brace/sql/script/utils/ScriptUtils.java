@@ -112,6 +112,31 @@ public abstract class ScriptUtils {
 		executeSqlScript(connection, script, false, false, DEFAULT_COMMENT_PREFIX, DEFAULT_STATEMENT_SEPARATOR,
 				DEFAULT_BLOCK_COMMENT_START_DELIMITER, DEFAULT_BLOCK_COMMENT_END_DELIMITER,singleSql);
 	}
+	
+	/**
+	 * Execute the given SQL script using default settings for statement
+	 * separators, comment delimiters, and exception handling flags.
+	 * <p>Statement separators and comments will be removed before executing
+	 * individual statements within the supplied script.
+	 * <p><strong>Warning</strong>: this method does <em>not</em> release the
+	 * provided {@link Connection}.
+	 * @param connection the JDBC connection to use to execute the script; already
+	 * configured and ready to use
+	 * @param resource the resource (potentially associated with a specific encoding)
+	 * to load the SQL script from
+	 * @throws ScriptException if an error occurred while executing the SQL script
+	 * @see #executeSqlScript(Connection, EncodedResource, boolean, boolean, String, String, String, String)
+	 * @see #DEFAULT_STATEMENT_SEPARATOR
+	 * @see #DEFAULT_COMMENT_PREFIX
+	 * @see #DEFAULT_BLOCK_COMMENT_START_DELIMITER
+	 * @see #DEFAULT_BLOCK_COMMENT_END_DELIMITER
+	 * @see org.springframework.jdbc.datasource.DataSourceUtils#getConnection
+	 * @see org.springframework.jdbc.datasource.DataSourceUtils#releaseConnection
+	 */
+	public static void executeSqlScript(Connection connection, String script,String[] commentPrefixes,SingleSql singleSql) throws ScriptException {
+		executeSqlScript(connection, script, false, false, commentPrefixes, DEFAULT_STATEMENT_SEPARATOR
+				, DEFAULT_BLOCK_COMMENT_START_DELIMITER, DEFAULT_BLOCK_COMMENT_END_DELIMITER, singleSql);
+	}
 
 	/**
 	 * Execute the given SQL script.
