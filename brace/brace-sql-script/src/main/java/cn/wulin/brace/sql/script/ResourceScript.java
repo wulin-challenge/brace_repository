@@ -416,5 +416,17 @@ public class ResourceScript implements InitializingBean{
 	public void setEngine(FreemarkerEngine engine) {
 		this.engine = engine;
 	}
+
+	public DefaultListableBeanFactory getBeanFactory() {
+		return beanFactory;
+	}
+
+	public SqlScriptDao getSqlScriptDao() {
+		return sqlScriptDao;
+	}
+
+	public FreemarkerEngine getEngine() {
+		return engine;
+	}
 	
 }
