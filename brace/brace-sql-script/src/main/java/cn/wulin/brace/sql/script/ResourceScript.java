@@ -81,33 +81,43 @@ public class ResourceScript implements InitializingBean{
 	
 	/**
 	 * 执行脚本
+	 * @param saveScript 是否保存脚本到数据库
 	 * @throws Exception
 	 */
-	public void executeScript() throws Exception {
-		executeScript(new HashMap<>(),ALL_SCRIPT);
+	public void executeScript(Boolean saveScript) throws Exception {
+		executeScript(new HashMap<>(),ALL_SCRIPT,saveScript);
 	}
 	
 	/**
 	 * 执行脚本
+	 * @param params 参数
+	 * @param saveScript 是否保存脚本到数据库
 	 * @throws Exception
 	 */
-	public void executeScript(Map<String,Object> params) throws Exception {
-		executeScript(params,ALL_SCRIPT);
+	public void executeScript(Map<String,Object> params,Boolean saveScript) throws Exception {
+		executeScript(params,ALL_SCRIPT,saveScript);
 	}
 
 	/**
 	 * 执行脚本
+	 * @param params 参数
+	 * @param name 执行命令的名称
+	 * @param saveScript 是否保存脚本到数据库
 	 * @throws Exception
 	 */
-	public void executeScript(Map<String,Object> params,String name) throws Exception {
-		executeScript(params,name, EngineParam.class);
+	public void executeScript(Map<String,Object> params,String name,Boolean saveScript) throws Exception {
+		executeScript(params,name, EngineParam.class,saveScript);
 	}
 
 	/**
 	 * 执行脚本
+	 * @param params 参数
+	 * @param name 执行命令的名称
+	 * @param engineParamClass freemarker引擎参数Class
+	 * @param saveScript 是否保存脚本到数据库
 	 * @throws Exception
 	 */
-	public void executeScript(Map<String,Object> params,String name, Class<? extends EngineParam> engineParamClass) throws Exception {
+	public void executeScript(Map<String,Object> params,String name, Class<? extends EngineParam> engineParamClass,Boolean saveScript) throws Exception {
 		List<Resource> resources = loadScriptResource();
 		
 		List<Sql> sqls = loadConfigFile(resources);
@@ -119,11 +129,14 @@ public class ResourceScript implements InitializingBean{
 					continue;
 				}
 				
-				if(!ALL_SCRIPT.equals(name) && command.getName().equals(name)) {
-					executeReallyScript(params, name, engineParamClass, sql, command);
-					return;
+				if(ALL_SCRIPT.equals(name)) {
+					executeReallyScript(params, name, engineParamClass, sql, command,saveScript);
+				}else {
+					if(!command.getName().equals(name)) {
+						continue;
+					}
+					executeReallyScript(params, name, engineParamClass, sql, command,saveScript);
 				}
-				executeReallyScript(params, name, engineParamClass, sql, command);
 			}
 		}
 	}
@@ -182,7 +195,7 @@ public class ResourceScript implements InitializingBean{
 		return null;
 	}
 	
-	private void executeReallyScript(Map<String,Object> params,String name, Class<? extends EngineParam> engineParamClass,Sql sql,Command command) throws Exception {
+	private void executeReallyScript(Map<String,Object> params,String name, Class<? extends EngineParam> engineParamClass,Sql sql,Command command,Boolean saveScript) throws Exception {
 		
 		Map<String,Object> sqlParam = new HashMap<>();
 		sqlParam.put("name", command.getName());
@@ -217,7 +230,11 @@ public class ResourceScript implements InitializingBean{
 		} catch (Exception e) {
 			LOGGER.error("执行脚本失败!",e);
 		}
-		saveSqlScript(command);
+		
+		if(saveScript) {
+			saveSqlScript(command);
+		}
+		
 	}
 	
 	private void saveSqlScript(Command command) throws Exception {

@@ -25,7 +25,7 @@ public class InitScript implements InitializingBean{
 		
 		Map<String,Object> params = new HashMap<>();
 		params.put("websiteCode", "itzhishi");
-		resourceScript.executeScript(params,"init_script");
+		resourceScript.executeScript(params,"init_script",true);
 		
 	}
 
