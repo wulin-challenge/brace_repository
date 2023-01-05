@@ -33,5 +33,10 @@ public class SqlScriptAutoConfiguration {
 	public SqlScriptDaoImpl sqlScriptDaoImpl() {
 		return new SqlScriptDaoImpl();
 	}
+	
+	@Bean
+	public InitializingScriptBeanPostProcessor initializingScriptBeanPostProcessor() {
+		return new InitializingScriptBeanPostProcessor();
+	}
 
 }

@@ -28,15 +28,18 @@ public class FreemarkerEngine {
 	
 	public String parseScript(EngineParam engineParam) {
 		
+		String text = engineParam.getCurrentCommand().getText().trim();
+		
 		StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
-		stringTemplateLoader.putTemplate(engineParam.getName(),engineParam.getCurrentCommand().getText());
+		stringTemplateLoader.putTemplate(engineParam.getName(),text);
 		cfg.setTemplateLoader(stringTemplateLoader);
 	   
 	    try (Writer writer = new StringWriter()){
 			Template template = cfg.getTemplate(engineParam.getName());
 			
 			template.process(engineParam,writer);
-			return writer.toString();
+			String processText = writer.toString();
+			return processText;
 		} catch (Exception e) {
 			LOGGER.error("freemarker执行出错!",e);
 		} 

@@ -31,6 +31,47 @@ public class EngineParam {
 	 */
 	private Map<String,Command> currentScripts = new HashMap<String,Command>();
 	
+
+	/**
+	 * 转义脚本,并将其进行缓存
+	 * @param name 命令名称
+	 * @param freemarkerParse 是否使用freemarker解析脚本
+	 * @return
+	 */
+	public String escapeScriptCache(String name,Boolean freemarkerParse) {
+		String key = this.name+":"+name+":escapeScript:cache";
+		String text = (String) params.get(key);
+		
+		if(params.containsKey(key) && StringUtils.isNotBlank(text)) {
+			params.put(key, text);
+			return text;
+		}
+		
+		text = escapeScript(name,freemarkerParse);
+		params.put(key, text);
+		return text;
+	}
+	
+	/**
+	 * 转义脚本
+	 * @param name 命令名称
+	 * @param freemarkerParse 是否使用freemarker解析脚本
+	 * @return
+	 */
+	public String escapeScript(String name,Boolean freemarkerParse) {
+		Command command = getCommand(name);
+		if(freemarkerParse) {
+			EngineParam engineParam = new EngineParam();
+			engineParam.setName(name);
+			engineParam.setCurrentScripts(currentScripts);
+			engineParam.getParams().putAll(this.getParams());
+			String selectSql = ENGINE.parseScript(engineParam);
+			
+			return selectSql;
+		}
+		return command.getText();
+	}
+	
 	/**
 	 * 在执行脚本前替换,后面的数字自增1
 	 * @return

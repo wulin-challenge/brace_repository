@@ -32,6 +32,7 @@ import cn.wulin.brace.sql.script.domain.Command;
 import cn.wulin.brace.sql.script.domain.CommandReturnEnum;
 import cn.wulin.brace.sql.script.domain.CommandTypeEnum;
 import cn.wulin.brace.sql.script.domain.EngineParam;
+import cn.wulin.brace.sql.script.domain.ScriptParams;
 import cn.wulin.brace.sql.script.domain.Sql;
 import cn.wulin.brace.sql.script.domain.SqlScriptEntity;
 import cn.wulin.brace.sql.script.properties.SqlScriptProperties;
@@ -46,7 +47,7 @@ public class ResourceScript implements InitializingBean{
 	/**
 	 * 表示执行所有脚本
 	 */
-	private final static String ALL_SCRIPT = "script:all";
+	public final static String ALL_SCRIPT = "script:all";
 	private final static Logger LOGGER = LoggerFactory.getLogger(ResourceScript.class);
 	
 	
@@ -118,6 +119,23 @@ public class ResourceScript implements InitializingBean{
 	 * @throws Exception
 	 */
 	public void executeScript(Map<String,Object> params,String name, Class<? extends EngineParam> engineParamClass,Boolean saveScript) throws Exception {
+		
+		ScriptParams scriptParams = new ScriptParams();
+		scriptParams.setName(name);
+		scriptParams.getParams().putAll(params);
+		scriptParams.setEngineParamClass(engineParamClass);
+		scriptParams.setSaveScript(saveScript);
+		
+		executeScript(scriptParams);
+	}
+	
+	/**
+	 * 执行脚本
+	 * @param scriptParams 脚本参数
+	 * @throws Exception 
+	 */
+	public void executeScript(ScriptParams scriptParams) throws Exception {
+		String name = scriptParams.getName();
 		List<Resource> resources = loadScriptResource();
 		
 		List<Sql> sqls = loadConfigFile(resources);
@@ -130,12 +148,12 @@ public class ResourceScript implements InitializingBean{
 				}
 				
 				if(ALL_SCRIPT.equals(name)) {
-					executeReallyScript(params, name, engineParamClass, sql, command,saveScript);
+					executeReallyScript(sql, command,scriptParams);
 				}else {
 					if(!command.getName().equals(name)) {
 						continue;
 					}
-					executeReallyScript(params, name, engineParamClass, sql, command,saveScript);
+					executeReallyScript(sql, command,scriptParams);
 				}
 			}
 		}
@@ -195,7 +213,44 @@ public class ResourceScript implements InitializingBean{
 		return null;
 	}
 	
-	private void executeReallyScript(Map<String,Object> params,String name, Class<? extends EngineParam> engineParamClass,Sql sql,Command command,Boolean saveScript) throws Exception {
+	/**
+	 * 得到指定名称的脚本
+	 * @param params
+	 * @param name
+	 * @param engineParamClass
+	 * @return
+	 * @throws Exception
+	 */
+	public String getScript(ScriptParams scriptParams) throws Exception{
+		List<Resource> resources = loadScriptResource();
+		List<Sql> sqls = loadConfigFile(resources);
+		
+		for (Sql sql : sqls) {
+			List<Command> commandList = sql.getCommandList();
+			for (Command command : commandList) {
+				
+				if(command.getName().equals(scriptParams.getName())) {
+					EngineParam engineParam = scriptParams.getEngineParamClass().newInstance();
+					engineParam.setName(command.getName());
+					engineParam.setCurrentScripts(sql);
+					engineParam.getParams().putAll(scriptParams.getParams());
+					
+					if(scriptParams.getFreemarkerParse()) {
+						String parseScript = engine.parseScript(engineParam);
+						return parseScript;
+					}else {
+						return command.getText();
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	private void executeReallyScript(Sql sql,Command command,ScriptParams scriptParams) throws Exception {
+		Map<String, Object> params = scriptParams.getParams();
+		Class<? extends EngineParam> engineParamClass = scriptParams.getEngineParamClass();
+		Boolean saveScript = scriptParams.getSaveScript();
 		
 		Map<String,Object> sqlParam = new HashMap<>();
 		sqlParam.put("name", command.getName());
@@ -210,7 +265,10 @@ public class ResourceScript implements InitializingBean{
 		engineParam.setCurrentScripts(sql);
 		engineParam.getParams().putAll(params);
 		
-		String parseScript = engine.parseScript(engineParam);
+		String parseScript = command.getText();
+		if(scriptParams.getFreemarkerParse()) {
+			parseScript = engine.parseScript(engineParam);
+		}
 		
 		if(StringUtils.isBlank(parseScript)) {
 			throw new RuntimeException("freemarker 执行失败!");
@@ -220,10 +278,12 @@ public class ResourceScript implements InitializingBean{
 			ScriptUtils.executeSqlScript(connection, parseScript,new String[] {"--","#"},new SingleSql() {
 				@Override
 				public String sql(String execSql) {
-					execSql = execSql.replaceAll("\\%\\{", "\\$\\{");
-					
-					engineParam.getCurrentCommand().setText(execSql);
-					execSql = engine.parseScript(engineParam);
+					if(scriptParams.getExecuteBeforeParse()) {
+						execSql = execSql.replaceAll("\\%\\{", "\\$\\{");
+						
+						engineParam.getCurrentCommand().setText(execSql);
+						execSql = engine.parseScript(engineParam);
+					}
 					return execSql;
 				}
 			});
