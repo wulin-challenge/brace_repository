@@ -3,6 +3,8 @@ package cn.wulin.brace.sql.script.examples;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.lin.linfreemarker.lin.LinfreemarkerHolder;
+import org.lin.linfreemarker.lin.LinfreemarkerThreadParams;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +27,11 @@ public class InitScript implements InitializingBean{
 		
 		Map<String,Object> params = new HashMap<>();
 		params.put("websiteCode", "itzhishi");
-		resourceScript.executeScript(params,"init_script",true);
+		
+		LinfreemarkerThreadParams threadParams= new LinfreemarkerThreadParams();
+		threadParams.setOutSrc(true);
+		LinfreemarkerHolder.setParam(threadParams);
+		resourceScript.executeScript(params,"init_script2",false);
 		
 	}
 

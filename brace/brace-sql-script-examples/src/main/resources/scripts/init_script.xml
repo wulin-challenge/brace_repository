@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sql database="mysql">
+	<command type="script" name="init_script2" table="">
+		<![CDATA[
+		
+		   dkfjdskjf法律上的降幅
+		   
+		   ${data11}
+		   
+		   发生的范德萨
+		
+			<#list replaceListCache('findByUser') as user>
+				delete from sys_user_role where user_id=${user.id};
+			</#list>
+			
+			看是否结束冷风机失落的房间
+			
+			<#list replaceListCache('findByUser') as user>
+				delete from sys_user_role where user_id=${user.id};
+			</#list>
+			结束冷风机失落的房间
+			
+			${getVariable('homeDesc:key')}
+			结束冷风机失落的房间
+			${data}
+		
+		]]>
+	</command>
 	<command type="script" name="init_script" table="">
 		<![CDATA[
 			INSERT INTO `sys_config`(`id`,`website_code`, `config_key`, `config_value`, `create_time`, `update_time`) VALUES (${replaceNumberSequence('findConfigMaxId')},  '${params.websiteCode}', 'homeDesc', '${setGetVariable('homeDesc:key',replaceMapCache('findByMap').config_value)}', now(), now());
