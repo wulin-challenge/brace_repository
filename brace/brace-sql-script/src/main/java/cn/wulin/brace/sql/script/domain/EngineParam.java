@@ -1,5 +1,7 @@
 package cn.wulin.brace.sql.script.domain;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import cn.hutool.core.lang.UUID;
 import cn.wulin.brace.sql.script.FreemarkerEngine;
 import cn.wulin.brace.sql.script.ResourceScript;
+import cn.wulin.brace.sql.script.dao.SqlScriptDao;
+import cn.wulin.brace.sql.script.utils.ScriptUtils;
+import cn.wulin.brace.sql.script.utils.ScriptUtils.SingleSql;
 
 /**
  * 引擎参数
@@ -177,6 +182,102 @@ public class EngineParam {
 			LOGGER.error("replaceNumber 执行数据库失败!",e);
 		}
 		return number;
+	}
+	
+	/**
+	 * 执行脚本
+	 * @param name 脚本的名称
+	 * @param freemarkerParse 是否使用freemarker解析脚本
+	 * @return
+	 */
+	public Boolean executeScript(String name) {
+		return executeScript(name, true);
+	}
+	
+	/**
+	 * 执行脚本
+	 * @param name 脚本的名称
+	 * @param freemarkerParse 是否使用freemarker解析脚本
+	 * @return
+	 */
+	public Boolean executeScript(String name,Boolean freemarkerParse) {
+		return executeScript(name, freemarkerParse, true);
+	}
+	
+	/**
+	 * 执行脚本
+	 * @param name 脚本的名称
+	 * @param freemarkerParse 是否使用freemarker解析脚本
+	 * @param saveScript 是否保存执行脚本
+	 * @return
+	 */
+	public Boolean executeScript(String name,Boolean freemarkerParse,Boolean saveScript) {
+		if(saveScript) {
+			SqlScriptDao sqlScriptDao = ResourceScript.getBeanFactory2().getBean(SqlScriptDao.class);
+			Map<String,Object> params = new HashMap<>();
+			params.put("name", name);
+			
+			try {
+				SqlScriptEntity sqlScript = sqlScriptDao.findOneByCondition(params);
+				if(sqlScript != null) {
+					return true;
+				}
+			} catch (Exception e) {
+				LOGGER.error("EngineParam.executeScript 的 sqlScriptDao.findOneByCondition 执行脚本失败!",e);
+				return false;
+			}
+		}
+		
+		Command command = getCommand(name);
+		
+		String parseScript = "";
+		
+		if(freemarkerParse) {
+			EngineParam engineParam = new EngineParam();
+			engineParam.setName(name);
+			engineParam.setCurrentScripts(currentScripts);
+			engineParam.getParams().putAll(this.getParams());
+			parseScript = ENGINE.parseScript(engineParam);
+		}else {
+			parseScript = command.getText();
+		}
+		
+		JdbcTemplate jdbcTemplate = ResourceScript.getBeanFactory2().getBean(JdbcTemplate.class);
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection();){
+			ScriptUtils.executeSqlScript(connection, parseScript,new String[] {"--","#"},new SingleSql() {
+				@Override
+				public String sql(String execSql) {
+					return execSql;
+				}
+			});
+			
+			if(saveScript) {
+				saveSqlScript(command);
+			}
+		} catch (Exception e) {
+			LOGGER.error("EngineParam.executeScript执行脚本失败!",e);
+			return false;
+		}
+		return true;
+	}
+	
+	private void saveSqlScript(Command command) throws Exception {
+		SqlScriptEntity sqlScript = new SqlScriptEntity();
+		long currentTime = System.currentTimeMillis();
+		sqlScript.setId(UUID.randomUUID().toString());
+		sqlScript.setContent(command.getText());
+		sqlScript.setDatabaseType(command.getDatabase());
+		sqlScript.setDescription(null);
+		sqlScript.setInited(SqlScriptEntity.INITED);
+		sqlScript.setName(command.getName());
+		sqlScript.setReturnType(command.getReturnType());
+		sqlScript.setTableName(command.getTable());
+		sqlScript.setType(command.getType());
+		sqlScript.setCreateDate(currentTime);
+		sqlScript.setModifyDate(currentTime);
+		
+		SqlScriptDao sqlScriptDao = ResourceScript.getBeanFactory2().getBean(SqlScriptDao.class);
+		sqlScriptDao.saveOrUpdateEntity(sqlScript);
 	}
 	
 	/**
