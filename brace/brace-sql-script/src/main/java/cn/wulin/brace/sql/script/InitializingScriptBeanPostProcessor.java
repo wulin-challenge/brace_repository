@@ -48,9 +48,14 @@ public class InitializingScriptBeanPostProcessor implements BeanPostProcessor,Pr
 				}
 			}
 		}
-		return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
+		return bean;
 	}
 	
+	@Override
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}
+
 	@Override
 	public int getOrder() {
 		return 0;
