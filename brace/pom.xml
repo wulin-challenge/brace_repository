@@ -324,5 +324,6 @@
 		<module>brace-spring-redis-extension</module>
 		<module>brace-sql-script</module>
 		<module>brace-sql-script-examples</module>
+		<module>brace-codejar-clear</module>
 	</modules>
 </project>
